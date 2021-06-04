@@ -22,12 +22,12 @@ const deploySC = async (name, symbol, address, SK) => {
         };
 
         let signedTransaction = await web3.eth.accounts.signTransaction(options, SK);
-        let deployContract = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
+        let deployContractTxResult = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
 
-        return [1, deployContract.contractAddress];
+        return [1, deployContractTxResult.contractAddress, deployContractTxResult.transactionHash];
     } catch (e) {
         console.log(e);
-        return [0, ""];
+        return [0, "", ""];
     }
 
 
@@ -39,7 +39,6 @@ const mintToken = async (scAddressHash, address, SK) => {
         let deployContract = new web3.eth.Contract(JSON.parse(abi), scAddressHash);
 
         let mintTokenTx = await deployContract.methods.safeMint(address);
-        console.log(address);
         let gas = await mintTokenTx.estimateGas({ from: address });
         let options = {
             to: mintTokenTx._parent._address,
