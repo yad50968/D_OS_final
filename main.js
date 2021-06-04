@@ -2,7 +2,9 @@
 const helper = require("./helper");
 const axios = require('axios');
 const web3Func = require('./web3Func');
-const apiUrl = "http://127.0.0.1:3000/";
+const apiUrl = "https://nftipfs.herokuapp.com/contract ";
+//const apiUrl = "http://127.0.0.1:3000";
+
 let processData = new Set();
 //const apiUrl = "https://firebasestorage.googleapis.com/v0/b/nft-ipfs.appspot.com/o/userdata.json?alt=media&token=3fdc509b-cfac-448f-b3dc-48ead043c05e&fbclid=IwAR0J8v9ALLGV-qFVnRTzTVxFCtV4CAS9wr1_O1gEdlhfR8VehKTQJhVrYjM";
 
@@ -15,28 +17,41 @@ const main = async () => {
 
         for (let jd of json_data) {
             let jdTurn = jd["turn"];
-            if (jdTurn === 2) {
+            if (jdTurn === 1) {
                 let jdId = jd["id"];
                 if (!processData.has(jdId)) {
                     processData.add(jdId);
                     let jdAddress = jd["address"];
                     let jdSK = jd["sk"];
-                    let jdName = jd["tokennam"];
-                    let jdSymbol = jd["nftnam"];
+                    let jdName = jd["tokenNam"];
+                    let jdSymbol = jd["nftNam"];
                     let jdUri = jd["uri"];
-                    let [checkSC, scAddressHash, scTxResultHash] = await web3Func.deploySC(jdName, jdSymbol, jdAddress, jdSK);
 
-                    let [checkMintToken, mintTokenTxResultHash] = await web3Func.mintToken(scAddressHash, jdAddress, jdSK);
+                    let checkAllOK = 0;
 
-                    let [checkSetURI, setURITxResultHash] = await web3Func.setTokenURI(scAddressHash, jdUri, jdAddress, jdSK);
+                    var [checkSC, scAddressHash, scTxResultHash] = await web3Func.deploySC(jdName, jdSymbol, jdAddress, jdSK);
 
-                    let success = checkSC && checkMintToken && checkSetURI;
+                    if (checkSC === 1) {
+                        var [checkMintToken, mintTokenTxResultHash] = await web3Func.mintToken(scAddressHash, jdAddress, jdSK);
 
-                    let finish = await helper.postResult(jdId, success, scAddressHash, scTxResultHash, setURITxResultHash);
+                        if (checkMintToken === 1) {
+                            var [checkSetURI, setURITxResultHash] = await web3Func.setTokenURI(scAddressHash, jdUri, jdAddress, jdSK);
 
-                    if (finish === 1) {
-                        processData.delete(jdId);
+                            if (checkSetURI === 1) {
+                                checkAllOK = 1;
+                            }
+                        }
                     }
+
+                    let finish;
+
+                    if (checkAllOK === 1) {
+                        finish = await helper.postResult(jdId, 1, scAddressHash, scTxResultHash, setURITxResultHash);
+                    } else {
+                        finish = await helper.postResult(jdId, 0, "", "", "");
+                    }
+
+                    processData.delete(jdId);
                 }
             }
         }

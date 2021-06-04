@@ -6,7 +6,6 @@ const abi = fs.readFileSync('./abi.json').toString();
 const bytecode = fs.readFileSync('./bytecode.bin').toString();
 
 const deploySC = async (name, symbol, address, SK) => {
-
     console.log('enter deploySC');
     try {
         let contract = new web3.eth.Contract(JSON.parse(abi));
@@ -48,7 +47,7 @@ const mintToken = async (scAddressHash, address, SK) => {
 
         return [1, mintTokenTxResult.transactionHash];
     } catch (e) {
-        console.log(e);
+        //console.log(e);
         return [0, ""];
     }
 }
@@ -72,7 +71,7 @@ const setTokenURI = async (scAddressHash, uri, address, SK) => {
 
         return [1, setURITxResult.transactionHash];
     } catch (e) {
-        console.log(e);
+        //console.log(e);
         return [0, ""];
     }
 }

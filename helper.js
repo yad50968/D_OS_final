@@ -1,5 +1,6 @@
 const axios = require('axios');
-const postURL = "http://127.0.0.1:3000/post";
+const postURL = "https://nftipfs.herokuapp.com/contract ";
+//const postURL = "http://127.0.0.1:3000/post ";
 
 const isEmptyObject = (value) => {
     return value && Object.keys(value).length === 0 && value.constructor === Object;
@@ -16,8 +17,7 @@ const postResult = async (id, success, scAddress, scTxResultHash, setURITxResult
     };
     try {
         let res = await axios.post(postURL, payload);
-
-        if (res.data.finish === 1) {
+        if (res.data.status === "finish") {
             return 1;
         } else {
             return 0;
