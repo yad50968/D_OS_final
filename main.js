@@ -55,8 +55,6 @@ const main = async () => {
                 }
             }
         }
-    } else {
-        console.log('current no data need to process');
     }
 }
 
