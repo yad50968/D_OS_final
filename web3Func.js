@@ -7,29 +7,85 @@ const bytecode = fs.readFileSync('./bytecode.bin').toString();
 
 
 
-const deploySC_Mint = async (jdName, jdSymbol, jdAddress, jdSK) => {
+const deploySC = async (name, symbol, address, SK) => {
 
     console.log('enter deploySC');
+    try {
+        let contract = new web3.eth.Contract(JSON.parse(abi));
 
-    let contract = new web3.eth.Contract(JSON.parse(abi));
+        let deployTx = await contract.deploy({ data: "0x" + bytecode, arguments: [name, symbol] });
 
-    let deploy_tx = await contract.deploy({data: "0x" + bytecode, arguments: [jdName, jdSymbol]});
+        let gas = await deployTx.estimateGas({ from: address });
+        let options = {
+            data: deployTx.encodeABI(),
+            gas: gas
+        };
 
-    let gas = await deploy_tx.estimateGas({from: jdAddress});
-    let options = {
-        to  : deploy_tx._parent._address,
-        data: deploy_tx.encodeABI(),
-        gas : gas
-    };
+        let signedTransaction = await web3.eth.accounts.signTransaction(options, SK);
+        let deployContract = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
 
-    let signedTransaction = await web3.eth.accounts.signTransaction(options, jdSK);
-    let deploy_address = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
+        return [1, deployContract.contractAddress];
+    } catch (e) {
+        console.log(e);
+        return [0, ""];
+    }
 
-    
 
+}
+
+const mintToken = async (scAddressHash, address, SK) => {
+    console.log('enter mintToken');
+    try {
+        let deployContract = new web3.eth.Contract(JSON.parse(abi), scAddressHash);
+
+        let mintTokenTx = await deployContract.methods.safeMint(address);
+        console.log(address);
+        let gas = await mintTokenTx.estimateGas({ from: address });
+        let options = {
+            to: mintTokenTx._parent._address,
+            data: mintTokenTx.encodeABI(),
+            gas: gas
+        };
+
+
+        let signedTransaction = await web3.eth.accounts.signTransaction(options, SK);
+        let mintTokenTxResult = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
+
+        return [1, mintTokenTxResult.transactionHash];
+    } catch (e) {
+        console.log(e);
+        return [0, ""];
+    }
+}
+
+const setTokenURI = async (scAddressHash, uri, address, SK) => {
+    console.log('enter setTokenURI');
+
+    try {
+        let deployContract = new web3.eth.Contract(JSON.parse(abi), scAddressHash);
+
+        let setTokenURITx = await deployContract.methods.setTokenURI(0, uri);
+
+        let gas = await setTokenURITx.estimateGas({ from: address });
+        let options = {
+            to: setTokenURITx._parent._address,
+            data: setTokenURITx.encodeABI(),
+            gas: gas
+        };
+
+        let signedTransaction = await web3.eth.accounts.signTransaction(options, SK);
+        let setURITxResult = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
+
+        return [1, setURITxResult.transactionHash];
+    } catch (e) {
+        console.log(e);
+        return [0, ""];
+    }
 }
 
 module.exports =
 {
-    deploySC_Mint
+    deploySC,
+    mintToken,
+    setTokenURI
 }

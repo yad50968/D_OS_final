@@ -13,8 +13,7 @@ async function main() {
     let response = await axios.get(apiUrl);
     let json_data = response['data'];
     if (!helper.isEmptyObject(json_data)) {
-        
-        console.log(json_data);
+
         json_data.forEach(async jd => {
             let jdTurn = jd["turn"];
             if (jdTurn === 2) {
@@ -23,9 +22,18 @@ async function main() {
                 let jdName = jd["tokennam"];
                 let jdSymbol = jd["nftnam"];
                 let jdUri = jd["uri"];
-                let sc_tx = await web3Func.deploySC_Mint(jdName, jdSymbol, jdAddress, jdSK);
-                //let mint_tx = await web3Func.mintToken(sc_tx, jdAddress, jdUri, jdSK);
-                console.log('fff');
+                let [checkSC, scAddressHash] = await web3Func.deploySC(jdName, jdSymbol, jdAddress, jdSK);
+
+                let [checkMintToken, mintTokenTxResultHash] = await web3Func.mintToken(scAddressHash, jdAddress, jdSK);
+
+
+                let [checkSetURI, setURITxResultHash] = await web3Func.setTokenURI(scAddressHash, jdUri, jdAddress, jdSK);
+
+                let success = checkSC && checkMintToken && checkSetURI;
+
+                let finish = await helper.postResult(success, scAddressHash, mintTokenTxResultHash, setURITxResultHash);
+
+                //if(check === 1) 
             }
         })
     } else {
