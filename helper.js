@@ -7,24 +7,25 @@ const isEmptyObject = (value) => {
 
 const postResult = async (id, success, scAddress, scTxResultHash, setURITxResultHash) => {
 
-    let payload = {"id": id,
-                   "success": success,
-                   "sc_addr": scAddress,
-                   "sc_tx_hash": scTxResultHash,
-                   "mint_tx_hash": setURITxResultHash};
-    try{
+    let payload = {
+        "id": id,
+        "success": success,
+        "sc_addr": scAddress,
+        "sc_tx_hash": scTxResultHash,
+        "mint_tx_hash": setURITxResultHash
+    };
+    try {
         let res = await axios.post(postURL, payload);
 
-        if(res.data.finish === 1){
+        if (res.data.finish === 1) {
             return 1;
-        } else{
+        } else {
             return 0;
         }
     } catch (e) {
         console.log(e);
         return 0;
     }
-    
 }
 
 module.exports =

@@ -5,8 +5,6 @@ const web3 = new Web3(rpcURL);
 const abi = fs.readFileSync('./abi.json').toString();
 const bytecode = fs.readFileSync('./bytecode.bin').toString();
 
-
-
 const deploySC = async (name, symbol, address, SK) => {
 
     console.log('enter deploySC');
@@ -29,8 +27,6 @@ const deploySC = async (name, symbol, address, SK) => {
         console.log(e);
         return [0, "", ""];
     }
-
-
 }
 
 const mintToken = async (scAddressHash, address, SK) => {
@@ -59,7 +55,6 @@ const mintToken = async (scAddressHash, address, SK) => {
 
 const setTokenURI = async (scAddressHash, uri, address, SK) => {
     console.log('enter setTokenURI');
-
     try {
         let deployContract = new web3.eth.Contract(JSON.parse(abi), scAddressHash);
 
