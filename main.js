@@ -10,52 +10,62 @@ let processData = new Set();
 
 
 const main = async () => {
+    if (processData.size === 0) {
+        let response = await axios.get(apiUrl);
+        let json_data = response['data'];
+        if (!helper.isEmptyObject(json_data)) {
 
-    let response = await axios.get(apiUrl);
-    let json_data = response['data'];
-    if (!helper.isEmptyObject(json_data)) {
+            for (let jd of json_data) {
+                let jdTurn = jd["turn"];
+                if (jdTurn === 2) { // process deploy
+                    if (!processData.has(jdId)) {
+                        processData.add(jdId);
+                        let jdAddress = jd["address"];
+                        let jdSK = jd["sk"];
+                        let jdName = jd["tokenNam"];
+                        let jdSymbol = jd["nftNam"];
 
-        for (let jd of json_data) {
-            let jdTurn = jd["turn"];
-            if (jdTurn === 1) {
-                let jdId = jd["id"];
-                if (!processData.has(jdId)) {
-                    processData.add(jdId);
-                    let jdAddress = jd["address"];
-                    let jdSK = jd["sk"];
-                    let jdName = jd["tokenNam"];
-                    let jdSymbol = jd["nftNam"];
-                    let jdUri = jd["uri"];
+                        var [checkSC, scAddress] = await web3Func.deploySC(jdName, jdSymbol, jdAddress, jdSK);
 
-                    let checkAllOK = 0;
+                        if (checkSC === 1) {
+                            console.log("contract addr: " + scAddressHash);
+                            finish = await helper.postDeploySCResult(jdId, 1, scAddress);
+                        } else {
+                            console.log("deploy error");
+                            finish = await helper.postDeploySCResult(jdId, 0, "");
+                        }
 
-                    var [checkSC, scAddressHash, scTxResultHash] = await web3Func.deploySC(jdName, jdSymbol, jdAddress, jdSK);
+                        processData.delete(jdId);
+                    }
+                }
+                else if (jdTurn === 1) {  // process mint
+                    let jdId = jd["id"];
+                    if (!processData.has(jdId)) {
+                        processData.add(jdId);
+                        let jdAddress = jd["address"];
+                        let jdSK = jd["sk"];
+                        let jdUri = jd["uri"];
+                        let jdSCAddress = jd["scaddress"];
+                        let checkAllOK = 0;
+                        console.log("id" + jdId);
 
-                    if (checkSC === 1) {
-                        var [checkMintToken, mintTokenTxResultHash] = await web3Func.mintToken(scAddressHash, jdAddress, jdSK);
+                        var [checkMintToken, mintTxHash] = await web3Func.mintToken(jdSCAddress, jdAddress, jdSK, jdUri);
 
                         if (checkMintToken === 1) {
-                            var [checkSetURI, setURITxResultHash] = await web3Func.setTokenURI(scAddressHash, jdUri, jdAddress, jdSK);
-
-                            if (checkSetURI === 1) {
-                                checkAllOK = 1;
-                            }
+                            finish = await helper.postResult(jdId, 1, mintTxHash);
+                        } else {
+                            finish = await helper.postResult(jdId, 0, "");
                         }
+
+                        processData.delete(jdId);
                     }
-
-                    let finish;
-
-                    if (checkAllOK === 1) {
-                        finish = await helper.postResult(jdId, 1, scAddressHash, scTxResultHash, setURITxResultHash);
-                    } else {
-                        finish = await helper.postResult(jdId, 0, "", "", "");
-                    }
-
-                    processData.delete(jdId);
                 }
             }
         }
+    } else {
+        console.log("set is not empty");
     }
 }
 
+//main();
 setInterval(main, 10000);

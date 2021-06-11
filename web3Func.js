@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const fs = require('fs');
-const rpcURL = 'http://127.0.0.1:8545';
-const web3 = new Web3(rpcURL);
+//const rpcURL = 'http://127.0.0.1:8545';
+
 const abi = fs.readFileSync('./abi.json').toString();
 const bytecode = fs.readFileSync('./bytecode.bin').toString();
 
@@ -21,19 +21,19 @@ const deploySC = async (name, symbol, address, SK) => {
         let signedTransaction = await web3.eth.accounts.signTransaction(options, SK);
         let deployContractTxResult = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
 
-        return [1, deployContractTxResult.contractAddress, deployContractTxResult.transactionHash];
+        return [1, deployContractTxResult.contractAddress];
     } catch (e) {
         console.log(e);
-        return [0, "", ""];
+        return [0, ""];
     }
 }
 
-const mintToken = async (scAddressHash, address, SK) => {
+const mintToken = async (scAddressHash, address, SK, uri) => {
     console.log('enter mintToken');
     try {
         let deployContract = new web3.eth.Contract(JSON.parse(abi), scAddressHash);
 
-        let mintTokenTx = await deployContract.methods.safeMint(address);
+        let mintTokenTx = await deployContract.methods.safeMint(address, uri);
         let gas = await mintTokenTx.estimateGas({ from: address });
         let options = {
             to: mintTokenTx._parent._address,
@@ -52,33 +52,9 @@ const mintToken = async (scAddressHash, address, SK) => {
     }
 }
 
-const setTokenURI = async (scAddressHash, uri, address, SK) => {
-    console.log('enter setTokenURI');
-    try {
-        let deployContract = new web3.eth.Contract(JSON.parse(abi), scAddressHash);
-
-        let setTokenURITx = await deployContract.methods.setTokenURI(0, uri);
-
-        let gas = await setTokenURITx.estimateGas({ from: address });
-        let options = {
-            to: setTokenURITx._parent._address,
-            data: setTokenURITx.encodeABI(),
-            gas: gas
-        };
-
-        let signedTransaction = await web3.eth.accounts.signTransaction(options, SK);
-        let setURITxResult = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
-
-        return [1, setURITxResult.transactionHash];
-    } catch (e) {
-        //console.log(e);
-        return [0, ""];
-    }
-}
 
 module.exports =
 {
     deploySC,
-    mintToken,
-    setTokenURI
+    mintToken
 }

@@ -1,0 +1,10 @@
+1. 安裝geth
+
+2. 下載rinkeby.json
+
+
+geth --datadir=./rinkeby init ./rinkeby.json
+
+geth --rinkeby --networkid=4 --datadir=./rinkeby --cache=512  --http --http.api="personal,eth" --nat=none --http.addr 0.0.0.0 --http.port 8545 --port 30303 --syncmode "fast"
+
+* networdid要與rinkeby.json裡的chainid一致

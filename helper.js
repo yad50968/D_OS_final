@@ -1,23 +1,45 @@
 const axios = require('axios');
-const postURL = "https://nftipfs.herokuapp.com/contract ";
+const postSCURL = "https://nftipfs.herokuapp.com/contract";
+const postMintURL = "https://nftipfs.herokuapp.com/mint";
 //const postURL = "http://127.0.0.1:3000/post ";
 
 const isEmptyObject = (value) => {
     return value && Object.keys(value).length === 0 && value.constructor === Object;
 }
 
-const postResult = async (id, success, scAddress, scTxResultHash, setURITxResultHash) => {
+const postDeploySCResult = async (id, success, scAddress) => {
 
     let payload = {
         "id": id,
         "success": success,
         "sc_addr": scAddress,
-        "sc_tx_hash": scTxResultHash,
-        "mint_tx_hash": setURITxResultHash
+    }
+    try {
+        let res = await axios.post(postSCURL, payload);
+        if (res.data.status === "finish") {
+            console.log("post_result:" + res.data.status);
+            return 1;
+        } else {
+            return 0;
+        }
+    } catch (e) {
+        console.log(e);
+        return 0;
+    }
+}
+
+
+const postMintResult = async (id, success, scTxResultHash) => {
+
+    let payload = {
+        "id": id,
+        "success": success,
+        "mint_tx_hash": scTxResultHash
     };
     try {
-        let res = await axios.post(postURL, payload);
+        let res = await axios.post(postMintURL, payload);
         if (res.data.status === "finish") {
+            console.log("post_result:" + res.data.status);
             return 1;
         } else {
             return 0;
@@ -31,5 +53,6 @@ const postResult = async (id, success, scAddress, scTxResultHash, setURITxResult
 module.exports =
 {
     isEmptyObject,
-    postResult
+    postDeploySCResult,
+    postMintResult
 }

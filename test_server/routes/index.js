@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', async (req, res, next) => {
-  res.json([{ id: "123456", turn: 1, tokennam: "tokennam", nftnam: "nftnam", uri: "uri", address: "abc", sk: "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d" }, { id: "777777", turn: 1, tokennam: "tokennam", nftnam: "nftnam", uri: "uri", address: "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1", sk: "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d" }]);
+  res.json([{"turn":1,"id":1623228776102,"sk":"0x256318c0cc3c28a26b486fdde33808962efa7f4e8c9e337e9d17f9defe4a8d75","address":"0x8d97CdA4d85755ECb61C5EDfd38f066D14F8d0e1","tokenNam":"hhh","nftNam":"3","desc":"3","supply":"3","creator":"3","assetType":"image/png","coverType":"image/png","submitTime":"2021/6/9","assetUrl":"https://firebasestorage.googleapis.com/v0/b/nft-ipfs.appspot.com/o/1623228776102%2Fasset.png?alt=media","coverUrl":"https://firebasestorage.googleapis.com/v0/b/nft-ipfs.appspot.com/o/1623228776102%2Fcover.png?alt=media","uri":"QmfBtTqzVsaJsAgbqR2GBzHzwUJaM7RUJEfkUH1eHQw9B5"}]);
 });
 
 router.post('/post', async (req, res, next) => {

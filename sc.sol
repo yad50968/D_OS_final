@@ -15,8 +15,9 @@ contract MyToken is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, 
 
     constructor(string memory name, string memory label) ERC721(name, label) {}
 
-    function safeMint(address to) public onlyOwner {
+    function safeMint(address to, string memory _tokenURI) public onlyOwner {
         _safeMint(to, _tokenIdCounter.current());
+        super._setTokenURI(_tokenIdCounter.current(), _tokenURI);
         _tokenIdCounter.increment();
     }
 
@@ -44,9 +45,6 @@ contract MyToken is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, 
         return super.tokenURI(tokenId);
     }
     
-    function setTokenURI(uint256 tokenId, string memory _tokenURI) public {
-        super._setTokenURI(tokenId, _tokenURI);
-    }
 
     function supportsInterface(bytes4 interfaceId)
         public
