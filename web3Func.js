@@ -5,14 +5,17 @@ const fs = require('fs');
 const abi = fs.readFileSync('./abi.json').toString();
 const bytecode = fs.readFileSync('./bytecode.bin').toString();
 
-const deploySC = async (name, symbol, address, SK) => {
+const deploySC = async (name, symbol, SK) => {
     console.log('enter deploySC');
     try {
         let contract = new web3.eth.Contract(JSON.parse(abi));
 
         let deployTx = await contract.deploy({ data: "0x" + bytecode, arguments: [name, symbol] });
-
+        let address = await web3.eth.accounts.privateKeyToAccount(SK).address;
         let gas = await deployTx.estimateGas({ from: address });
+        
+        
+        
         let options = {
             data: deployTx.encodeABI(),
             gas: gas
@@ -28,11 +31,11 @@ const deploySC = async (name, symbol, address, SK) => {
     }
 }
 
-const mintToken = async (scAddressHash, address, SK, uri) => {
+const mintToken = async (scAddressHash, SK, uri) => {
     console.log('enter mintToken');
     try {
         let deployContract = new web3.eth.Contract(JSON.parse(abi), scAddressHash);
-
+        let address = await web3.eth.accounts.privateKeyToAccount(SK).address;
         let mintTokenTx = await deployContract.methods.safeMint(address, uri);
         let gas = await mintTokenTx.estimateGas({ from: address });
         let options = {
