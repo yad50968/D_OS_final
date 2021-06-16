@@ -10,6 +10,7 @@ let processData = new Set();
 
 
 const main = async () => {
+    console.log("gogo");
     if (processData.size === 0) {
         let response = await axios.get(apiUrl);
         let json_data = response['data'];
@@ -46,6 +47,7 @@ const main = async () => {
                         let jdSK = jd["sk"];
                         let jdUri = jd["uri"];
                         let jdSCAddress = jd["scaddress"];
+                        console.log(jdSCAddress);
                         console.log("id" + jdId);
 
                         var [checkMintToken, mintTxHash] = await web3Func.mintToken(jdSCAddress, jdSK, jdUri);
@@ -66,5 +68,4 @@ const main = async () => {
     }
 }
 
-main();
-//setInterval(main, 10000);
+setInterval(main, 10000);

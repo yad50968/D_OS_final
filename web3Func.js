@@ -12,13 +12,13 @@ const deploySC = async (name, symbol, SK) => {
 
         let deployTx = await contract.deploy({ data: "0x" + bytecode, arguments: [name, symbol] });
         let address = await web3.eth.accounts.privateKeyToAccount(SK).address;
-        let gas = await deployTx.estimateGas({ from: address });
+        //let gas = await deployTx.estimateGas({ from: address });
         
         
         
         let options = {
             data: deployTx.encodeABI(),
-            gas: gas
+            gas: 8000000
         };
 
         let signedTransaction = await web3.eth.accounts.signTransaction(options, SK);
@@ -37,11 +37,11 @@ const mintToken = async (scAddressHash, SK, uri) => {
         let deployContract = new web3.eth.Contract(JSON.parse(abi), scAddressHash);
         let address = await web3.eth.accounts.privateKeyToAccount(SK).address;
         let mintTokenTx = await deployContract.methods.safeMint(address, uri);
-        let gas = await mintTokenTx.estimateGas({ from: address });
+        //let gas = await mintTokenTx.estimateGas({ from: address });
         let options = {
-            to: mintTokenTx._parent._address,
+            to: scAddressHash,
             data: mintTokenTx.encodeABI(),
-            gas: gas
+            gas: 8000000
         };
 
 
@@ -50,7 +50,7 @@ const mintToken = async (scAddressHash, SK, uri) => {
 
         return [1, mintTokenTxResult.transactionHash];
     } catch (e) {
-        //console.log(e);
+        console.log(e);
         return [0, ""];
     }
 }
