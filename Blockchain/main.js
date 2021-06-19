@@ -6,7 +6,6 @@ const apiUrl = "https://nftipfs.herokuapp.com/contract";
 //const apiUrl = "http://127.0.0.1:3000";
 
 let processData = new Set();
-//const apiUrl = "https://firebasestorage.googleapis.com/v0/b/nft-ipfs.appspot.com/o/userdata.json?alt=media&token=3fdc509b-cfac-448f-b3dc-48ead043c05e&fbclid=IwAR0J8v9ALLGV-qFVnRTzTVxFCtV4CAS9wr1_O1gEdlhfR8VehKTQJhVrYjM";
 
 
 const main = async () => {
