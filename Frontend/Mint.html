@@ -1,0 +1,240 @@
+<html>
+<head>
+	<title>NFT Wallet</title>
+  <style>
+.header {
+  text-align: center;
+  background: #0B1E33;
+  color: white;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
+}
+body {background-color: #f5f5f5;}
+.button {
+  background-color: white;
+  border: 2px solid #e7e7e7;
+  color: black;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+.button:hover {background-color: #e7e7e7;}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>分散式系統期末專題</h2>
+    <h1>Mint Token</h1>
+  </div>
+
+  <div style="text-align:center;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;">
+	<!-- <h2>Deploy Your NFT</h2> -->
+  <p>Secret Key: <input type="text" id="sk" value=""></p>
+
+  <p>Address: <input type="text" id="address" value=""></p>
+
+  <p>Contract Address: <input type="text" id="scaddress" value=""></p>
+
+  <!-- <p>Token Name: <input type="text" id="tokenName" value=""></p> -->
+  
+  <!-- <p>NFT Name: <input type="text" id="nftName" value=""></p> -->
+
+  <p>Description: <input type="text" id="description" value=""></p>
+
+  <!-- <p>Total Supply: <input type="text" id="supply" value=""></p> -->
+
+  <p>Creator: <input type="text" id="creator" value=""></p>
+
+  <p>Upload Asset(Image/Audio): <input type="file" id="fileButton1" value="upload" accept="image/*,audio/*"></p>
+  
+  <p>Upload Cover(Image): <input type="file" id="fileButton2" value="upload" accept="image/*"></p>
+
+  <button class="button" id="submit" type="button" onclick="submit()">Submit</button>
+  <p id="status"></p>
+  
+  <p id="key"></p>
+</div>
+
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js" integrity="sha256-nWBTbvxhJgjslRyuAKJHK+XcZPlCnmIAAMixz6EefVk=" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyC2rzsz1kE7UdS4J0xxl4s3dMM8pbgydgc",
+    authDomain: "nft-ipfs.firebaseapp.com",
+    projectId: "nft-ipfs",
+    storageBucket: "nft-ipfs.appspot.com",
+    messagingSenderId: "996214046998",
+    appId: "1:996214046998:web:edbc62a4388630b254d037"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  async function get_name(contract_address){
+    contract = web3.eth.contract(address=contract_address, abi=abi)
+    output = contract.methods.name().call()
+    return output
+  }
+
+  async function  get_symbol(contract_address){
+
+    var contract = new Contract(abi,contract_address);
+    output = contract.methods.symbol().call()
+    return output 
+  }
+
+  async function total_supply(contract_address){
+    contract = web3.eth.contract(address=contract_address, abi=abi)
+    output = await contract.methods.totalSupply().call();
+    return output
+  }
+
+  async function submit() {
+    try{
+    document.getElementById("submit").disabled = true;
+    document.getElementById("status").innerHTML = "";
+    document.getElementById("key").innerHTML = "";
+    var file1=document.getElementById('fileButton1').files[0];
+    // console.log(file1.size);
+    var file2=document.getElementById('fileButton2').files[0];
+    var sk=document.getElementById('sk').value;
+    var address=document.getElementById('address').value;
+    var scaddress=document.getElementById('scaddress').value;
+    // var token=document.getElementById('tokenName').value;
+    // var nft=document.getElementById('nftName').value;
+    var description=document.getElementById('description').value;
+    // var supply=document.getElementById('supply').value;
+    var creator=document.getElementById('creator').value;
+    var type1= file1.name.split('.').pop();
+    var type2= file2.name.split('.').pop();
+    if(!file1||!file2||description==''||creator==''||sk==''||address==''||scaddress==''){
+    document.getElementById("status").innerHTML = "Upload Failed⚠️";
+    document.getElementById("submit").disabled = false;
+    }else{
+    var abi = await fetch('https://weippig.github.io/mypage/Contract_ABI', {
+      method: 'GET',
+    })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(data) {
+      return data;
+    })
+    // var address = '0xd149fb62a43ee78d52170520e62885fb9f6788e8';
+    var web3 = new Web3(new Web3.providers.HttpProvider('https://rinkeby.infura.io/v3/e178b744d5984a0881e1b7f04d485f46'));
+    var contract = new web3.eth.Contract(abi,scaddress);
+    var nft = await contract.methods.name().call();
+    var token = await contract.methods.symbol().call();
+    var supply = await contract.methods.totalSupply().call();
+
+
+    const dateTime = Date.now();
+    const timestamp = Math.floor(dateTime);
+    var currentdate = new Date(); 
+    var datetime = currentdate.getFullYear()+ "/" +(currentdate.getMonth()+1)+"/"+currentdate.getDate()
+
+
+    var obj = new Object();
+    obj.turn = 0;
+    obj.id = timestamp;
+    obj.sk = sk;
+    obj.address = address
+    obj.scaddress = scaddress
+    obj.tokenNam = token;
+    obj.nftNam = nft;
+    obj.desc = description;
+    obj.supply = supply;
+    obj.creator = creator;
+    obj.assetType = file1.type;
+    obj.coverType = file2.type;
+    obj.submitTime = datetime;
+    obj.assetUrl = "https://firebasestorage.googleapis.com/v0/b/nft-ipfs.appspot.com/o/"+timestamp+"%2Fasset."+type1+"?alt=media";
+    obj.coverUrl = "https://firebasestorage.googleapis.com/v0/b/nft-ipfs.appspot.com/o/"+timestamp+"%2Fcover."+type2+"?alt=media";
+    var file3 = new Blob([JSON.stringify(obj)], {
+      type: "application/json",
+    });
+
+
+    const lockref = firebase.storage().ref("").child("lock");
+    
+  
+    lockref.delete().then(() => {
+    // Lock Available
+    fetch("https://nftipfs.herokuapp.com/userd")
+    .then((response) => {
+      return response.json()
+    })
+    .then((data) => {
+      data.push(obj);
+      var file4 = new Blob([JSON.stringify(data)], {
+      type: "application/json",
+      });
+      var storageRef = firebase.storage().ref('userdata.json');
+      storageRef.put(file4);
+      var file5 = new Blob([], {
+      type: "application/octet-stream",
+      });
+      var storageRef = firebase.storage().ref('lock');
+      storageRef.put(file5);
+    })
+    .catch((err) => {
+      var file5 = new Blob([], {
+      type: "application/octet-stream",
+      });
+      var storageRef = firebase.storage().ref('lock');
+      storageRef.put(file5);
+
+      document.getElementById("status").innerHTML = "Upload Failed⚠️";
+      throw "Fetch error!!"
+    });
+
+
+
+
+
+    var storageRef = firebase.storage().ref(timestamp+'/asset.'+type1);
+    storageRef.put(file1);
+    var storageRef = firebase.storage().ref(timestamp+'/cover.'+type2);
+    storageRef.put(file2);
+    var storageRef = firebase.storage().ref(timestamp+'/profile.json');
+    storageRef.put(file3);
+
+    document.getElementById("key").innerHTML = "Please copy the code:"+timestamp;
+    document.getElementById("status").innerHTML = "🟢Upload Successful!";
+    setTimeout(function(){fetch('https://nftipfs.herokuapp.com/user');},1500)
+    setTimeout(function(){fetch('https://nftipfs.herokuapp.com/user');},1000)
+    setTimeout(function(){document.getElementById("submit").disabled = false;},1500)
+
+  }).catch((error) => {
+    // Race condition occurred!
+    document.getElementById("status").innerHTML = "Oops there was an error! Please try again⚠️";
+    document.getElementById("submit").disabled = false;
+  })
+
+
+
+    }
+    
+    }
+    catch (e) {
+    document.getElementById("status").innerHTML = "Upload Failed⚠️";
+    document.getElementById("submit").disabled = false;
+    console.log(e)
+    }
+
+}
+
+
+</script>
+</html>

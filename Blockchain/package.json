@@ -11,5 +11,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "web3": "^1.3.6"
+  },
+  "devDependencies": {
+    "ws": ">=5.2.3"
   }
 }

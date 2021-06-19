@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const fs = require('fs');
 //const rpcURL = 'http://127.0.0.1:8545';
-
+var web3 = new Web3(new Web3.providers.HttpProvider(""));
 const abi = fs.readFileSync('./abi.json').toString();
 const bytecode = fs.readFileSync('./bytecode.bin').toString();
 
@@ -31,11 +31,10 @@ const deploySC = async (name, symbol, SK) => {
     }
 }
 
-const mintToken = async (scAddressHash, SK, uri) => {
+const mintToken = async (address, scAddressHash, SK, uri) => {
     console.log('enter mintToken');
     try {
         let deployContract = new web3.eth.Contract(JSON.parse(abi), scAddressHash);
-        let address = await web3.eth.accounts.privateKeyToAccount(SK).address;
         let mintTokenTx = await deployContract.methods.safeMint(address, uri);
         //let gas = await mintTokenTx.estimateGas({ from: address });
         let options = {

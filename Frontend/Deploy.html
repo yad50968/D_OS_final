@@ -1,0 +1,190 @@
+<html>
+<head>
+  <meta charset="utf-8">
+	<title>Deploy</title>
+  <style>
+.header {
+  text-align: center;
+  background: #0B1E33;
+  color: white;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
+}
+body {background-color: #f5f5f5;}
+.button {
+  background-color: white;
+  border: 2px solid #e7e7e7;
+  color: black;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+.button:hover {background-color: #e7e7e7;}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>分散式系統期末專題</h2>
+    <h1>Deploy</h1>
+  </div>
+
+  <div style="text-align:center;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;">
+	<!-- <h2>Deploy Your NFT</h2> -->
+  <p>Token Name: <input type="text" id="tokenname" value=""></p>
+
+  <p>NFT Name: <input type="text" id="nftname" value=""></p>
+  
+  <p>Secret key: <input type="text" id="sk" value=""></p>
+
+  <button class="button" id="submit" type="button" onclick="submit()">Submit</button>
+  <p id="status"></p>
+  <p id="key"></p>
+  <p id="success"></p>
+  <p id="contract"></p>
+</div>
+
+</body>
+
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyC2rzsz1kE7UdS4J0xxl4s3dMM8pbgydgc",
+    authDomain: "nft-ipfs.firebaseapp.com",
+    projectId: "nft-ipfs",
+    storageBucket: "nft-ipfs.appspot.com",
+    messagingSenderId: "996214046998",
+    appId: "1:996214046998:web:edbc62a4388630b254d037"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  function submit() {
+    try{
+      document.getElementById("submit").disabled = true;
+      document.getElementById("status").innerHTML = "";
+      document.getElementById("key").innerHTML = "";
+      document.getElementById("success").innerHTML = "";
+      document.getElementById("contract").innerHTML = "";
+      var sk=document.getElementById('sk').value;
+      var tokenname=document.getElementById('tokenname').value;
+      var nftname=document.getElementById('nftname').value;
+      if(tokenname==''||sk==''||nftname==''){
+      document.getElementById("status").innerHTML = "Upload Failed⚠️";
+      document.getElementById("submit").disabled = false;
+    }else{
+      const dateTime = Date.now();
+      const timestamp = Math.floor(dateTime);
+      var currentdate = new Date(); 
+      var datetime = currentdate.getFullYear()+ "/" +(currentdate.getMonth()+1)+"/"+currentdate.getDate()
+
+
+      var obj = new Object();
+      obj.turn = 2;
+      obj.id = timestamp;
+      obj.sk = sk;
+      obj.tokenname = tokenname;
+      obj.nftname = nftname;
+      var file3 = new Blob([JSON.stringify(obj)], {
+        type: "application/json",
+      });
+
+
+      const lockref = firebase.storage().ref("").child("lock");
+      
+    
+      lockref.delete().then(() => {
+      // Lock Available
+      fetch("https://nftipfs.herokuapp.com/userd")
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        data.push(obj);
+        var file4 = new Blob([JSON.stringify(data)], {
+        type: "application/json",
+        });
+        var storageRef = firebase.storage().ref('userdata.json');
+        storageRef.put(file4);
+        var file5 = new Blob([], {
+        type: "application/octet-stream",
+        });
+        var storageRef = firebase.storage().ref('lock');
+        storageRef.put(file5);
+      })
+      .catch((err) => {
+        var file5 = new Blob([], {
+        type: "application/octet-stream",
+        });
+        var storageRef = firebase.storage().ref('lock');
+        storageRef.put(file5);
+
+        document.getElementById("status").innerHTML = "Upload Failed⚠️";
+        throw "Fetch error!!"
+      });
+
+
+      var storageRef = firebase.storage().ref(timestamp+'/profile.json');
+      storageRef.put(file3);
+
+      document.getElementById("key").innerHTML = "Please copy the code:"+timestamp;
+      document.getElementById("status").innerHTML = "🟢Upload Successful!";
+      setTimeout(function(){fetch('https://nftipfs.herokuapp.com/user');},1500)
+      setTimeout(function(){fetch('https://nftipfs.herokuapp.com/user');},1000)
+      // setTimeout(function(){document.getElementById("submit").disabled = false;},1500)
+      var wait = setInterval(function() {
+        fetch("https://firebasestorage.googleapis.com/v0/b/nft-ipfs.appspot.com/o/"+timestamp+"d.json?alt=media")
+            .then((response) => {
+              return response.json()
+            })
+            .then((data) => {
+              if(data.success==1){
+                  //部署成功 result 是合約地址
+                  document.getElementById("success").innerHTML = "🟢Deploy Successful!";
+                  result=data.sc_addr
+                  document.getElementById("contract").innerHTML = "Cotract address: "+result;
+                  document.getElementById("submit").disabled = false;
+                  clearInterval(wait)
+              }else if(data.success==0){
+                  //部署失敗
+                  document.getElementById("success").innerHTML = "Deploy Failed⚠️";
+                  document.getElementById("submit").disabled = false;
+                  clearInterval(wait)
+              }else{
+                ;
+              }
+            })
+            .catch((err) => {
+              console.log("error")
+              document.getElementById("success").innerHTML = "Oops there was an error! Please try again⚠️";
+              document.getElementById("submit").disabled = false;
+            })
+        }, 5000);
+      }).catch((error) => {
+        // Race condition occurred!
+        document.getElementById("status").innerHTML = "Oops there was an error! Please try again⚠️";
+        document.getElementById("submit").disabled = false;
+      })
+    }
+    }
+    catch (e) {
+    document.getElementById("status").innerHTML = "Upload Failed⚠️";
+    document.getElementById("submit").disabled = false;
+    console.log(e)
+    }
+
+  }
+
+
+  
+</script>
+  
+</html>

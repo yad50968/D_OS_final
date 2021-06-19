@@ -47,10 +47,11 @@ const main = async () => {
                         let jdSK = jd["sk"];
                         let jdUri = jd["uri"];
                         let jdSCAddress = jd["scaddress"];
+                        let jdAddress = jd["address"];
                         console.log(jdSCAddress);
                         console.log("id" + jdId);
 
-                        var [checkMintToken, mintTxHash] = await web3Func.mintToken(jdSCAddress, jdSK, jdUri);
+                        var [checkMintToken, mintTxHash] = await web3Func.mintToken(jdAddress, jdSCAddress, jdSK, jdUri);
 
                         if (checkMintToken === 1) {
                             finish = await helper.postMintResult(jdId, 1, mintTxHash);
@@ -69,3 +70,4 @@ const main = async () => {
 }
 
 setInterval(main, 10000);
+//web3Func.mintToken("0x8d97CdA4d85755ECb61C5EDfd38f066D14F8d0e1", "0xbdb3b0fb6f09c2e46b5e8de52a9144ee214cac03", "256318c0cc3c28a26b486fdde33808962efa7f4e8c9e337e9d17f9defe4a8d75", "hello");
