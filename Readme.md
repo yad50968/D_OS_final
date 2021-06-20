@@ -4,9 +4,8 @@
 
 Install & Setting:
 1. cd Backend
-2. 創建credential files
-3. 創建serviceAccountKey.json (Firebase)
-4. pip install -r requirements.txt
+2. 創建serviceAccountKey.json (Firebase)
+3. pip install -r requirements.txt
 
 Run:
 uvicorn main:app --reload
