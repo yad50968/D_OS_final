@@ -1,7 +1,6 @@
 const axios = require('axios');
 const postSCURL = "https://nftipfs.herokuapp.com/contract";
 const postMintURL = "https://nftipfs.herokuapp.com/mint";
-//const postURL = "http://127.0.0.1:3000/post ";
 
 const isEmptyObject = (value) => {
     return value && Object.keys(value).length === 0 && value.constructor === Object;

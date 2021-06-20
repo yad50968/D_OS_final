@@ -3,7 +3,6 @@ const helper = require("./helper");
 const axios = require('axios');
 const web3Func = require('./web3Func');
 const apiUrl = "https://nftipfs.herokuapp.com/contract";
-//const apiUrl = "http://127.0.0.1:3000";
 
 let processData = new Set();
 

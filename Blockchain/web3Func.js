@@ -1,6 +1,5 @@
 const Web3 = require('web3');
 const fs = require('fs');
-//const rpcURL = 'http://127.0.0.1:8545';
 var web3 = new Web3(new Web3.providers.HttpProvider(""));
 const abi = fs.readFileSync('./abi.json').toString();
 const bytecode = fs.readFileSync('./bytecode.bin').toString();
